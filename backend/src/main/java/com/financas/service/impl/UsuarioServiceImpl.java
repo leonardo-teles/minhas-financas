@@ -1,6 +1,7 @@
 package com.financas.service.impl;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.financas.exception.RegraNegocioException;
 import com.financas.model.Usuario;
@@ -23,8 +24,11 @@ public class UsuarioServiceImpl implements UsuarioService {
 	}
 
 	@Override
+	@Transactional
 	public Usuario salvarUsuario(Usuario usuario) {
-		return null;
+		validarEmail(usuario.getEmail());
+		
+		return usuarioRepository.save(usuario);
 	}
 
 	@Override
