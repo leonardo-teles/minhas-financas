@@ -1,31 +1,35 @@
 package com.financas.service;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.Mockito;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.financas.exception.RegraNegocioException;
-import com.financas.model.Usuario;
 import com.financas.repository.UsuarioRepository;
+import com.financas.service.impl.UsuarioServiceImpl;
 
-@SpringBootTest
 @RunWith(SpringRunner.class)
 @ActiveProfiles("test")
 public class UsuarioServiceTest {
 
-	@Autowired
 	UsuarioService usuarioService;
 
-	@Autowired
+	@MockBean
 	UsuarioRepository usuarioRepository;
+	
+	@Before
+	public void setUp() {
+		usuarioService = new UsuarioServiceImpl(usuarioRepository);
+	}
 	
 	@Test(expected = Test.None.class)
 	public void deveValidarEmail() {
 		//cenário
-		usuarioRepository.deleteAll();
+		Mockito.when(usuarioRepository.existsByEmail(Mockito.anyString())).thenReturn(false);
 		
 		//ação
 		usuarioService.validarEmail("email@email.com");
@@ -34,8 +38,7 @@ public class UsuarioServiceTest {
 	@Test(expected = RegraNegocioException.class)
 	public void deveLancarErroAoValidarEmailQuandoExistirEmailCadastrado() {
 		//cenário
-		Usuario usuario = Usuario.builder().nome("usuario").email("email@email.com").build();
-		usuarioRepository.save(usuario);
+		Mockito.when(usuarioRepository.existsByEmail(Mockito.anyString())).thenReturn(true);
 		
 		//ação
 		usuarioService.validarEmail("email@email.com");
