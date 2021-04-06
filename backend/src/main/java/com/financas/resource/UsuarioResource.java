@@ -1,7 +1,12 @@
 package com.financas.resource;
 
+import java.math.BigDecimal;
+import java.util.Optional;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,6 +16,7 @@ import com.financas.dto.UsuarioDTO;
 import com.financas.exception.ErroAutenticacaoException;
 import com.financas.exception.RegraNegocioException;
 import com.financas.model.Usuario;
+import com.financas.service.LancamentoService;
 import com.financas.service.UsuarioService;
 
 @RestController
@@ -19,8 +25,11 @@ public class UsuarioResource {
 
 	private UsuarioService usuarioService;
 	
-	public UsuarioResource(UsuarioService usuarioService) {
+	private LancamentoService lancamentoService;
+	
+	public UsuarioResource(UsuarioService usuarioService, LancamentoService lancamentoService) {
 		this.usuarioService = usuarioService;
+		this.lancamentoService = lancamentoService;
 	}
 	
 	@PostMapping("/autenticar")
@@ -47,5 +56,19 @@ public class UsuarioResource {
 		} catch (RegraNegocioException e) {
 			return ResponseEntity.badRequest().body(e.getMessage());
 		}
+	}
+	
+	@GetMapping("{id}/saldo")
+	@SuppressWarnings("rawtypes")
+	public ResponseEntity obterSaldo(@PathVariable("id") Long id) {
+		Optional<Usuario> usuario = usuarioService.obterPorId(id);
+		
+		if (!usuario.isPresent()) {
+			return new ResponseEntity(HttpStatus.NOT_FOUND);
+		}
+		
+		BigDecimal saldo = lancamentoService.obterSaldoPorUsuario(id);
+		
+		return ResponseEntity.ok(saldo);
 	}
 }
