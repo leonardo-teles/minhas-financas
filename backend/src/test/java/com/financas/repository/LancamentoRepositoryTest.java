@@ -79,7 +79,7 @@ public class LancamentoRepositoryTest {
 		assertThat(lancamentoEncontrado.isPresent()).isTrue();
 	}
 
-	private Lancamento criarlancamento() {
+	public static Lancamento criarlancamento() {
 		return Lancamento.builder()
 				   .descricao("lancamento qualquer")
 				   .mes(4)
