@@ -94,7 +94,7 @@ public class LancamentoResource {
 	
 	@PutMapping("{id}/atualizar-status")
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public ResponseEntity atualizarStatus(@PathVariable("id") Long id, AtualizaStatusDTO atualizaStatusDTO) {
+	public ResponseEntity atualizarStatus(@PathVariable("id") Long id, @RequestBody AtualizaStatusDTO atualizaStatusDTO) {
 		return lancamentoService.obterPorId(id).map(l -> {
 			StatusLancamento statusSelecionado = StatusLancamento.valueOf(atualizaStatusDTO.getStatus());
 			
