@@ -1,11 +1,15 @@
 package com.financas.service;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.data.domain.Example;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -56,7 +60,79 @@ public class LancamentoServiceTest {
 		Assertions.catchThrowableOfType(() -> lancamentoServiceImpl.salvar(lancamentoASalvar), RegraNegocioException.class);
 		
 		Mockito.verify(lancamentoRepository, Mockito.never()).save(lancamentoASalvar);
+	}
+	
+	@Test
+	public void deveAtualizarUmLancamento() {
+		//cenário
+		Lancamento lancamentoSalvo = LancamentoRepositoryTest.criarlancamento();
+		lancamentoSalvo.setId(1L);
+		lancamentoSalvo.setStatus(StatusLancamento.PENDENTE);
 		
+		Mockito.doNothing().when(lancamentoServiceImpl).validar(lancamentoSalvo);
+		
+		Mockito.when(lancamentoRepository.save(lancamentoSalvo)).thenReturn(lancamentoSalvo);
+		
+		//execução
+		lancamentoServiceImpl.atualizar(lancamentoSalvo);
+		
+		//verificação
+		Mockito.verify(lancamentoRepository, Mockito.times(1)).save(lancamentoSalvo);
+	}
+	
+	@Test
+	public void deveLancarErroAoTentarAtualizarUmLancamentoQueAindaNaoFoiSalvo() {
+		//cenário
+		Lancamento lancamento = LancamentoRepositoryTest.criarlancamento();
+		
+		//execução e verificação
+		Assertions.catchThrowableOfType(() -> lancamentoServiceImpl.atualizar(lancamento), NullPointerException.class);
+		
+		Mockito.verify(lancamentoRepository, Mockito.never()).save(lancamento);
+		
+	}
+	
+	@Test
+	public void deveDeletarUmLancamento() {
+		//cenário
+		Lancamento lancamento = LancamentoRepositoryTest.criarlancamento();
+		lancamento.setId(1L);
+		
+		//execução
+		lancamentoServiceImpl.deletar(lancamento);
+		
+		//verificação
+		Mockito.verify(lancamentoRepository).delete(lancamento);
+	}
+	
+	@Test
+	public void deveLancarErroAoTentarDeletarUmLancamentoQueAindaNaoFoiSalvo() {
+		//cenário
+		Lancamento lancamento = LancamentoRepositoryTest.criarlancamento();
+		
+		//execução
+		Assertions.catchThrowableOfType(() -> lancamentoServiceImpl.deletar(lancamento), NullPointerException.class);
+		
+		//verificação
+		Mockito.verify(lancamentoRepository, Mockito.never()).delete(lancamento);
+		
+	}
+	
+	@Test
+	@SuppressWarnings("unchecked")
+	public void deveFiltrarLancamentos() {
+		//cenário
+		Lancamento lancamento = LancamentoRepositoryTest.criarlancamento();
+		lancamento.setId(1L);
+		
+		List<Lancamento> lista = Arrays.asList(lancamento);
+		Mockito.when(lancamentoRepository.findAll(Mockito.any(Example.class))).thenReturn(lista);
+		
+		//execução
+		List<Lancamento> resultado = lancamentoServiceImpl.buscar(lancamento);
+		
+		//verificação
+		Assertions.assertThat(resultado).isNotEmpty().hasSize(1).contains(lancamento);
 	}
 	
 }
