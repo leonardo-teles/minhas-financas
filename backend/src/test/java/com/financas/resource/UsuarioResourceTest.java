@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.financas.dto.UsuarioDTO;
 import com.financas.exception.ErroAutenticacaoException;
+import com.financas.exception.RegraNegocioException;
 import com.financas.model.Usuario;
 import com.financas.service.LancamentoService;
 import com.financas.service.UsuarioService;
@@ -66,7 +67,6 @@ public class UsuarioResourceTest {
 			.andExpect(MockMvcResultMatchers.jsonPath("id").value(usuario.getId()))
 			.andExpect(MockMvcResultMatchers.jsonPath("nome").value(usuario.getNome()))
 			.andExpect(MockMvcResultMatchers.jsonPath("email").value(usuario.getEmail()));
-			
 	}
 	
 	@Test
@@ -90,6 +90,54 @@ public class UsuarioResourceTest {
 		mvc
 			.perform(request)
 			.andExpect(MockMvcResultMatchers.status().isBadRequest());
-			
+	}
+	
+	@Test
+	public void deveCriarUmNovoUsuario() throws Exception {
+		//cenário
+		String email = "usuario@email.com";
+		String senha = "123";
+		
+		UsuarioDTO usuarioDTO = UsuarioDTO.builder().email("usuario@email.com").senha("123").build();
+		Usuario usuario = Usuario.builder().id(1L).email(email).senha(senha).build();
+
+		Mockito.when(usuarioService.salvarUsuario(Mockito.any(Usuario.class))).thenReturn(usuario);
+		
+		String json = new ObjectMapper().writeValueAsString(usuarioDTO);
+		
+		//execução e verificação
+		MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+			.post(API)
+			.accept(JSON)
+			.contentType(JSON)
+			.content(json);
+		
+		mvc
+			.perform(request)
+			.andExpect(MockMvcResultMatchers.status().isCreated())
+			.andExpect(MockMvcResultMatchers.jsonPath("id").value(usuario.getId()))
+			.andExpect(MockMvcResultMatchers.jsonPath("nome").value(usuario.getNome()))
+			.andExpect(MockMvcResultMatchers.jsonPath("email").value(usuario.getEmail()));
+	}
+	
+	@Test
+	public void deveRetornarBadRequestAoTentarCriarUmUsuarioInvalido() throws Exception {
+		//cenário
+		UsuarioDTO usuarioDTO = UsuarioDTO.builder().email("usuario@email.com").senha("123").build();
+
+		Mockito.when(usuarioService.salvarUsuario(Mockito.any(Usuario.class))).thenThrow(RegraNegocioException.class);
+		
+		String json = new ObjectMapper().writeValueAsString(usuarioDTO);
+		
+		//execução e verificação
+		MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+			.post(API)
+			.accept(JSON)
+			.contentType(JSON)
+			.content(json);
+		
+		mvc
+			.perform(request)
+			.andExpect(MockMvcResultMatchers.status().isBadRequest());
 	}
 }
