@@ -5,6 +5,7 @@ import Card from '../components/card';
 import FormGroup from '../components/form-group';
 
 import UsuarioService from '../app/service/usuarioService';
+import LocalStorageService from '../app/service/localStorageService';
 
 class Login extends React.Component {
 
@@ -21,15 +22,15 @@ class Login extends React.Component {
 
     entrar = () => {
         this.service.autenticar({
-                email: this.state.email,
-                senha: this.state.senha
+            email: this.state.email,
+            senha: this.state.senha
         })
         .then(response => {
-                localStorage.setItem('_usuario_logado', JSON.stringify(response.data));
-                this.props.history.push('/home');
+            LocalStorageService.adicionarItem('_usuario_logado', response.data);                
+            this.props.history.push('/home');
         })
         .catch(error => {
-                this.setState({mensagemErro: error.response.data})
+            this.setState({mensagemErro: error.response.data})
         })
     }
 
