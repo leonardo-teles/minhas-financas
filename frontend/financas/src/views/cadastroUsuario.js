@@ -3,9 +3,9 @@ import { withRouter } from 'react-router-dom';
 
 import UsuarioService from '../app/service/usuarioService';
 
-import { mensagemErro, mensagemSucesso } from '../components/toastr';
 import Card from '../components/card';
 import FormGroup from '../components/form-group';
+import { mensagemErro, mensagemSucesso } from '../components/toastr';
 
 class CadastroUsuario extends React.Component {
 
@@ -30,7 +30,7 @@ class CadastroUsuario extends React.Component {
 
         if(!this.state.email) {
             msgs.push('O campo e-mail é obrigatório');
-        } else if(!this.state.email.match()) {
+        } else if(!this.state.email.match(/^[a-z0-9.]+@[a-z0-9]+\.[a-z]/)) {
             msgs.push('Informe um e-Mail válido');
         }
 
@@ -51,7 +51,7 @@ class CadastroUsuario extends React.Component {
                 mensagemErro(msg)
             });
 
-            return false;
+            return false;   
         }
 
         const usuario = {
