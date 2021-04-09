@@ -23,15 +23,15 @@ export function mostrarMensagem(titulo, mensagem, tipo) {
 }
 
 export function mensagemErro(mensagem) {
-    mostrarMensagem('Erro', mensagem, 'error');
+    mostrarMensagem('Erro', mensagem, "error");
 }
 
 export function mensagemSucesso(mensagem) {
-    mostrarMensagem('Sucesso', mensagem, 'success');
+    mostrarMensagem('Sucesso', mensagem, "success");
 }
 
 export function mensagemAlerta(mensagem) {
-    mostrarMensagem('Alerta', mensagem, 'warning');
+    mostrarMensagem('Alerta', mensagem, "warning");
 }
 
 
