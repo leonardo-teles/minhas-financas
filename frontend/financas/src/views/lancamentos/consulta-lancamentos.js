@@ -9,12 +9,15 @@ import FormGroup from '../../components/form-group';
 import SelectMenu from '../../components/selectMenu';
 import LancamentosTable from './lancamentosTable';
 
+import * as mensagens from '../../components/toastr';
+
 class ConsultaLancamentos extends React.Component {
 
     state = {
         ano: '',
         mes: '',
         tipo: '',
+        descricao: '',
         lancamentos: []
     }
 
@@ -24,12 +27,19 @@ class ConsultaLancamentos extends React.Component {
     }
 
     buscar = () => {
+        if(!this.state.ano) {
+            mensagens.mensagemErro('O preenchimento do campo ano é obrigatório');
+
+            return false;
+        }
+
         const usuarioLogado = LocalStorageService.obterItem('_usuario_logado');
 
         const lancamentoFiltro = {
             ano: this.state.ano,
             mes: this.state.mes,
             tipo: this.state.tipo,
+            descricao: this.state.descricao,
             usuario: usuarioLogado.id
         }
 
@@ -43,27 +53,9 @@ class ConsultaLancamentos extends React.Component {
     }
 
     render() {
-        const meses = [
-            {label: 'Selecione...', value: ''},
-            {label: 'Janeiro'     , value: 1},
-            {label: 'Fevereiro'   , value: 2},
-            {label: 'Março'       , value: 3},
-            {label: 'Abril'       , value: 4},
-            {label: 'Maio'        , value: 5},
-            {label: 'Junho'       , value: 6},
-            {label: 'Julho'       , value: 7},
-            {label: 'Agosto'      , value: 8},
-            {label: 'Setembro'    , value: 9},
-            {label: 'Outubro'     , value: 10},
-            {label: 'Novembro'    , value: 11},
-            {label: 'Dezembro'    , value: 12}
-        ];
+        const meses = this.service.obterListaMeses();
 
-        const tipos = [
-            {label: 'Selecione...', value: ''},
-            {label: 'Despesa',      value: 'DESPESA'},
-            {label: 'Receita',      value: 'RECEITA'}
-        ]
+        const tipos = this.service.obterListaTipos();
 
         return(
             <Card title="Consultar Lançamentos">
@@ -87,6 +79,16 @@ class ConsultaLancamentos extends React.Component {
                                     onChange={e => this.setState({mes: e.target.value})}
                                     className="form-control"  
                                     lista={meses}/>
+                            </FormGroup>
+
+                            <FormGroup htmlFor="inputDescricao" label="Descrição: ">
+                                <input 
+                                    type="text" 
+                                    className="form-control" 
+                                    id="inputDescricao" 
+                                    value={this.state.descricao}
+                                    onChange={e => this.setState({descricao: e.target.value})}
+                                    placeholder="Digite a descrição"/>
                             </FormGroup>
 
                             <FormGroup htmlFor="inputTipo" label="Tipo Lançamento: *">
