@@ -49,6 +49,15 @@ class CadastroLancamentos extends React.Component {
         const { descricao, valor, mes, ano, tipo } = this.state;
 
         const lancamento = { descricao, valor, mes, ano, tipo, usuario: usuarioLogado.id };
+
+        try {
+            this.service.validar(lancamento);
+        } catch (error) {
+            const msgs = error.msgs;
+            msgs.forEach(msg => mensagens.mensagemErro(msg));
+
+            return false;
+        }
         
         this.service
             .salvar(lancamento)
