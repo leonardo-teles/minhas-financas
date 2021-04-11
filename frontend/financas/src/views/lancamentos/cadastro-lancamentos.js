@@ -19,7 +19,8 @@ class CadastroLancamentos extends React.Component {
         ano: '',
         tipo: '',
         status: '',
-        usuario: null
+        usuario: null,
+        atualizando: false
     }
 
     constructor() {
@@ -34,7 +35,7 @@ class CadastroLancamentos extends React.Component {
             this.service
                 .obterPorId(params.id)
                 .then(response => {
-                    this.setState({...response.data})
+                    this.setState({...response.data, atualizando: true})
                 }).catch(error => {
                     mensagens.mensagemErro(error.response.data);
                 })
@@ -87,7 +88,7 @@ class CadastroLancamentos extends React.Component {
         const meses = this.service.obterListaMeses();        
 
         return(
-            <Card title="Cadastro de Lançamentos">
+            <Card title={this.state.atualizando ? 'Atualização de Lançamento' : 'Cadastro de Lançamento'}>
                 <div className="row">
                     <div className="col-md-12">
                         <FormGroup id="inputDescricao" label="Descrição: *">
@@ -164,8 +165,15 @@ class CadastroLancamentos extends React.Component {
 
                 <div className="row">
                     <div className="col-md-6">
-                        <button onClick={this.submit} className="btn btn-success">Salvar</button>
-                        <button onClick={this.atualizar} className="btn btn-primary">Atualizar</button>
+                        {this.state.atualizando ? 
+                            (
+                                <button onClick={this.atualizar} className="btn btn-primary">Atualizar</button>
+                            ) 
+                            : 
+                            (
+                                <button onClick={this.submit} className="btn btn-success">Salvar</button>
+                            )
+                        }
                         <button onClick={e => this.props.history.push('/consulta-lancamentos')} className="btn btn-danger">Cancelar</button>
                     </div>
                 </div>
