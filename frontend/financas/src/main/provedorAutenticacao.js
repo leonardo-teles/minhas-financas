@@ -1,11 +1,9 @@
 import React from 'react';
 import AuthService from '../app/service/authService';
 
-export const AuthContext = React.createContext({
-
-})
-
+export const AuthContext = React.createContext();
 export const AuthConsumer = AuthContext.Consumer;
+
 const AuthProvider = AuthContext.Provider;
 
 class ProvedorAutenticacao extends React.Component {
@@ -22,7 +20,7 @@ class ProvedorAutenticacao extends React.Component {
 
     encerrarSessao = () => {
         AuthService.removerUsuarioAutenticado();
-        this.state({isAutenticado: false, usuarioAutenticado: null});
+        this.setState({isAutenticado: false, usuarioAutenticado: null});
     }
     
     render() {

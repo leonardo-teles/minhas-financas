@@ -6,14 +6,12 @@ import Login from '../views/login';
 import CadastroUsuario from '../views/cadastroUsuario';
 import ConsultaLancamentos from '../views/lancamentos/consulta-lancamentos';
 import cadastroLancamentos from '../views/lancamentos/cadastro-lancamentos';
-import AuthService from '../app/service/authService';
+import { AuthConsumer } from './provedorAutenticacao';
 
-
-
-function RotaAutenticada({component: Component, ...props}) {
+function RotaAutenticada({component: Component, isUsuarioAutenticado, ...props}) {
     return(
         <Route {...props} render={(componentProps) => {
-            if(AuthService.isUsuarioAutenticado()) {
+            if(isUsuarioAutenticado) {
                 return(
                     <Component {...componentProps}/>
                 )
@@ -26,19 +24,24 @@ function RotaAutenticada({component: Component, ...props}) {
     )
 }
 
-function Rotas() {
+function Rotas(props) {
     return(
         <HashRouter>
             <Switch>
                 <Route path="/login" component={Login}/>
                 <Route path="/cadastro-usuario" component={CadastroUsuario}/>
 
-                <RotaAutenticada path="/home" component={Home}/>
-                <RotaAutenticada path="/consulta-lancamentos" component={ConsultaLancamentos}/>
-                <RotaAutenticada path="/cadastro-lancamentos/:id?" component={cadastroLancamentos}/>
+                <RotaAutenticada isUsuarioAutenticado={props.isUsuarioAutenticado} path="/home" component={Home}/>
+                <RotaAutenticada isUsuarioAutenticado={props.isUsuarioAutenticado} path="/consulta-lancamentos" component={ConsultaLancamentos}/>
+                <RotaAutenticada isUsuarioAutenticado={props.isUsuarioAutenticado} path="/cadastro-lancamentos/:id?" component={cadastroLancamentos}/>
             </Switch>
         </HashRouter>
     )
 }
 
-export default Rotas;
+// eslint-disable-next-line
+export default () => (
+    <AuthConsumer>
+        {(context) => (<Rotas isUsuarioAutenticado={context.isAutenticado}/>)}
+    </AuthConsumer>
+)
